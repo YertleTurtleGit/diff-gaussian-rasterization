@@ -452,7 +452,9 @@ renderCUDA(
 		for (int i = 0; i < C; i++)
 			dL_dpixel[i] = dL_dpixels[i * H * W + pix_id];
 
-	float last_alpha = 0;
+	// CUSTOM
+	//float last_alpha = 0;
+	float last_alpha = 1.0f;
 	float last_color[C] = { 0 };
 
 	// Gradient of pixel coordinate w.r.t. normalized 
@@ -496,7 +498,9 @@ renderCUDA(
 				continue;
 
 			const float G = exp(power);
-			const float alpha = min(0.99f, con_o.w * G);
+			// CUSTOM
+			//const float alpha = min(0.99f, con_o.w * G);
+			const float alpha = 1.0f,
 			if (alpha < 1.0f / 255.0f)
 				continue;
 

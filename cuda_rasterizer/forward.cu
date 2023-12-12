@@ -350,6 +350,9 @@ renderCUDA(
 				continue;
 			}
 
+			// CUSTOM
+			alpha = 1.0f;
+
 			// Eq. (3) from 3D Gaussian splatting paper.
 			for (int ch = 0; ch < CHANNELS; ch++)
 				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
