@@ -505,12 +505,12 @@ renderCUDA(
 				continue;
 
 			T = T / (1.f - alpha);
-			const float dchannel_dcolor = alpha * T;
+			const float dchannel_dcolor = 1.0f;
 
 			// Propagate gradients to per-Gaussian colors and keep
 			// gradients w.r.t. alpha (blending factor for a Gaussian/pixel
 			// pair).
-			float dL_dalpha = 0.0f;
+			float dL_dalpha = 1.0f;
 			const int global_id = collected_id[j];
 			for (int ch = 0; ch < C; ch++)
 			{
@@ -520,13 +520,13 @@ renderCUDA(
 				last_color[ch] = c;
 
 				const float dL_dchannel = dL_dpixel[ch];
-				dL_dalpha += (c - accum_rec[ch]) * dL_dchannel;
+				//dL_dalpha += (c - accum_rec[ch]) * dL_dchannel;
 				// Update the gradients w.r.t. color of the Gaussian. 
 				// Atomic, since this pixel is just one of potentially
 				// many that were affected by this Gaussian.
 				atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_dchannel);
 			}
-			dL_dalpha *= T;
+			//dL_dalpha *= T;
 			// Update last alpha (to be used in the next iteration)
 			last_alpha = alpha;
 
@@ -535,7 +535,7 @@ renderCUDA(
 			float bg_dot_dpixel = 0;
 			for (int i = 0; i < C; i++)
 				bg_dot_dpixel += bg_color[i] * dL_dpixel[i];
-			dL_dalpha += (-T_final / (1.f - alpha)) * bg_dot_dpixel;
+			//dL_dalpha += (-T_final / (1.f - alpha)) * bg_dot_dpixel;
 
 
 			// Helpful reusable temporary variables

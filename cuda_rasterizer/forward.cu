@@ -339,8 +339,10 @@ renderCUDA(
 			// Eq. (2) from 3D Gaussian splatting paper.
 			// Obtain alpha by multiplying with Gaussian opacity
 			// and its exponential falloff from mean.
-			// Avoid numerical instabilities (see paper appendix). 
-			float alpha = min(0.99f, con_o.w * exp(power));
+			// Avoid numerical instabilities (see paper appendix).
+			// CUSTOM
+			alpha = 1.0f; 
+			/*float alpha = min(0.99f, con_o.w * exp(power));
 			if (alpha < 1.0f / 255.0f)
 				continue;
 			float test_T = T * (1 - alpha);
@@ -348,16 +350,15 @@ renderCUDA(
 			{
 				done = true;
 				continue;
-			}
+			}*/
 
-			// CUSTOM
-			alpha = 1.0f;
+			
 
 			// Eq. (3) from 3D Gaussian splatting paper.
 			for (int ch = 0; ch < CHANNELS; ch++)
 				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
 
-			T = test_T;
+			//T = test_T;
 
 			// Keep track of last range entry to update this
 			// pixel.
