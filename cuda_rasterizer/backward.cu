@@ -495,10 +495,10 @@ renderCUDA(
 			if (power > 0.0f)
 				continue;
 
-			const float G = 1.0f;
-			const float alpha = 0.99f;
-			/*if (alpha < 1.0f / 255.0f)
-				continue;*/
+			const float G = exp(power);
+			const float alpha = min(0.99f, con_o.w * G);
+			if (alpha < 1.0f / 255.0f)
+				continue;
 
 			T = T / (1.f - alpha);
 			const float dchannel_dcolor = alpha * T;
@@ -512,7 +512,7 @@ renderCUDA(
 			{
 				const float c = collected_colors[ch * BLOCK_SIZE + j];
 				// Update last color (to be used in the next iteration)
-				//accum_rec[ch] = last_alpha * last_color[ch] + (1.f - last_alpha) * accum_rec[ch];
+				accum_rec[ch] = last_alpha * last_color[ch] + (1.f - last_alpha) * accum_rec[ch];
 				last_color[ch] = c;
 
 				const float dL_dchannel = dL_dpixel[ch];
@@ -520,7 +520,7 @@ renderCUDA(
 				// Update the gradients w.r.t. color of the Gaussian. 
 				// Atomic, since this pixel is just one of potentially
 				// many that were affected by this Gaussian.
-				atomicAdd(&(dL_dcolors[global_id * C + ch]), 1.0f);
+				atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_dchannel);
 			}
 			dL_dalpha *= T;
 			// Update last alpha (to be used in the next iteration)
@@ -535,11 +535,11 @@ renderCUDA(
 
 
 			// Helpful reusable temporary variables
-			const float dL_dG = 1.0f;
+			const float dL_dG = con_o.w * dL_dalpha;
 			const float gdx = G * d.x;
 			const float gdy = G * d.y;
-			const float dG_ddelx = -gdx - gdy;
-			const float dG_ddely = -gdy - gdx;
+			const float dG_ddelx = -gdx * con_o.x - gdy * con_o.y;
+			const float dG_ddely = -gdy * con_o.z - gdx * con_o.y;
 
 			// Update gradients w.r.t. 2D mean position of the Gaussian
 			atomicAdd(&dL_dmean2D[global_id].x, dL_dG * dG_ddelx * ddelx_dx);
