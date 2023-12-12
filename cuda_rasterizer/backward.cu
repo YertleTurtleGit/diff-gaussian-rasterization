@@ -500,7 +500,7 @@ renderCUDA(
 			const float G = exp(power);
 			// CUSTOM
 			//const float alpha = min(0.99f, con_o.w * G);
-			const float alpha = 1.0f,
+			const float alpha = 1.0f;
 			if (alpha < 1.0f / 255.0f)
 				continue;
 
