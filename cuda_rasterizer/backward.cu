@@ -512,8 +512,8 @@ renderCUDA(
 			// Helpful reusable temporary variables
 			const float gdx = d.x;
 			const float gdy = d.y;
-			const float dG_ddelx = -gdx  - gdy;
-			const float dG_ddely = -gdy - gdx ;
+			const float dG_ddelx = -gdx - gdy;
+			const float dG_ddely = -gdy - gdx;
 
 			// Update gradients w.r.t. 2D mean position of the Gaussian
 			atomicAdd(&dL_dmean2D[global_id].x, dG_ddelx * ddelx_dx);
